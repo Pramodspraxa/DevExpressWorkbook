@@ -8,7 +8,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Logging.ClearProviders();
 builder.Logging.AddNLog();
 
-LogManager.LoadConfiguration("Nlog.config");
+LogManager.LoadConfiguration("NLog.config");
 
 var app = builder.Build();
 var logger = LogManager.GetCurrentClassLogger();
@@ -52,6 +52,12 @@ app.MapGet("/generate-workbook/{templateType?}", async (HttpContext context, str
 		using (Workbook workbook = new Workbook())
 		{
 			Worksheet worksheet;
+			// Create an instance of XlsxLoadOptions
+			//var options = new XlsxLoadOptions
+			//{
+			//	UseBufferedStreaming = true, // Enable buffered streaming
+			//	BufferSize = 8192           // Set the buffer size (in bytes) for optimized loading
+			//};
 			if (templateType.Equals("template-based"))
 			{
 				logger.Trace($"worksheet.LoadDocument Started for TemplateType = {templateType}.");
@@ -78,6 +84,7 @@ app.MapGet("/generate-workbook/{templateType?}", async (HttpContext context, str
 				rowIndex += chunk.Count();
 			}
 			logger.Trace($"worksheet.Import Completed for TemplateType = {templateType}.");
+			rawData = null;
 			workbook.Calculate();
 			workbook.EndUpdate();
 			using (var ms = new MemoryStream())
