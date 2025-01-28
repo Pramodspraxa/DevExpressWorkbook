@@ -20,6 +20,9 @@
     <Reference Include="DevExpress.Docs.v23.1">
       <HintPath>references\netstandard\DevExpress.Docs.v23.1.dll</HintPath>
     </Reference>
+    <Reference Include="DevExpress.Drawing.v23.1.Skia">
+      <HintPath>references\DevExpress.23.1\DevExpress.Drawing.v23.1.Skia.dll</HintPath>
+    </Reference>
     <Reference Include="DevExpress.Office.v23.1.Core">
       <HintPath>references\netstandard\DevExpress.Office.v23.1.Core.dll</HintPath>
     </Reference>
