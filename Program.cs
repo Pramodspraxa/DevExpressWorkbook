@@ -2,7 +2,6 @@ using DevExpress.Spreadsheet;
 using DevExpressWorkbookApi;
 using NLog;
 using NLog.Extensions.Logging;
-using NLog.Web;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -10,6 +9,7 @@ builder.Logging.ClearProviders();
 builder.Logging.AddNLog();
 
 LogManager.LoadConfiguration("Nlog.config");
+
 var app = builder.Build();
 var logger = LogManager.GetCurrentClassLogger();
 
@@ -64,7 +64,7 @@ app.MapGet("/generate-workbook/{templateType?}", async (HttpContext context, str
 			{
 				worksheet = workbook.Worksheets[0];
 			}
-			
+
 			int rowIndex = 2; // Start from row 2 since row 1 is header
 			int rawDataCount = rawData.Count;
 			logger.Trace($"worksheet.Import Started for TemplateType = {templateType}.");
