@@ -2,6 +2,7 @@ using DevExpress.Spreadsheet;
 using DevExpressWorkbookApi;
 using NLog;
 using NLog.Extensions.Logging;
+using System;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -82,7 +83,17 @@ app.MapGet("/generate-workbook/{templateType?}", async (HttpContext context, str
 			{
 				worksheet = workbook.Worksheets[0];
 			}
-
+			int index = 0;
+			foreach (var item in columns)
+			{
+				worksheet[1, index].SetValue(item);
+				worksheet[1, index].Fill.BackgroundColor = System.Drawing.ColorTranslator.FromHtml("#16365c");
+				worksheet[1, index].Font.Color = System.Drawing.ColorTranslator.FromHtml("#fff");
+				worksheet[1, index].Font.Bold = true;
+				index++;
+			}
+			worksheet.Columns[index - 1].WidthInPixels = 100;
+			worksheet.Cells.Alignment.WrapText = true;
 			int rowIndex = 2; // Start from row 2 since row 1 is header
 			int rawDataCount = rawData.Count;
 			logger.Trace($"worksheet.Import Started for TemplateType = {templateType}.");
@@ -95,10 +106,14 @@ app.MapGet("/generate-workbook/{templateType?}", async (HttpContext context, str
 				}
 				rowIndex += chunk.Count();
 			}
+			worksheet.Columns["A"].NumberFormat = "dd-MMM-yyyy";
+			DevExpress.Spreadsheet.CellRange rangeFilter = worksheet.Range["A2:AD2"];
+			worksheet.AutoFilter.Apply(rangeFilter);
 			logger.Trace($"worksheet.Import Completed for TemplateType = {templateType}.");
 			rawData = null;
 			workbook.Calculate();
 			workbook.EndUpdate();
+			logger.Trace($"workbook.SaveDocument Started for TemplateType = {templateType}.");
 			using (var ms = new MemoryStream())
 			{
 				workbook.SaveDocument(ms, DocumentFormat.Xlsx);
