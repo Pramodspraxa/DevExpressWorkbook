@@ -65,7 +65,7 @@ app.MapGet("/generate-workbook/{templateType?}", async (HttpContext context, str
 		}
 
 		logger.Trace($"Dummy data generated. Populating workbook for TemplateType = {templateType}");
-		bool applyFormatting = false;
+		bool applyFormatting = true;
 		// Create a new workbook
 		using (Workbook workbook = new Workbook())
 		{
