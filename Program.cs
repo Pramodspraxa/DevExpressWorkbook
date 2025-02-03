@@ -18,7 +18,7 @@ app.MapGet("/generate-workbook/{templateType?}", async (HttpContext context, str
 {
 	try
 	{
-		var columns = new string[10] { "Id", "Name", "Description", "Description2", "Description3", "Description4", "Description5", "Description6", "Description7", "Description8" };
+		var columns = new string[30] { "Date", "HSCode", "ProductDescription", "Importer", "Exporter", "RelatedParty", "StdQty", "StdUnit", "GrossWeight", "Quantity", "UnitRateUSD", "QuantityUnit", "Value", "OriginCountry", "OriginPort", "DestinationCountry", "DestinationPort", "BillLadingNo", "Mode", "Measurment", "Tax", "DeliveryPortNameNew", "TEU", "FreightTermNew", "MarksNumber", "ImporterAdd1", "ExporterAdd1", "RelatedPartyAdd1", "HS4HS8Description", "CountryName" };
 		int ChunkSize = 5000;
 		int totalRecords = 60000;
 		string fileName = "SampleData.xlsx";
@@ -26,23 +26,41 @@ app.MapGet("/generate-workbook/{templateType?}", async (HttpContext context, str
 		templateType = string.IsNullOrWhiteSpace(templateType) ? "new" : "template-based";
 		logger.Trace($"Starting workbook generation for TemplateType = {templateType}");
 
-		var rawData = new List<GlobalData>();
+		var rawData = new List<GlobalDownloadMappingData>();
 
 		for (int i = 1; i <= totalRecords; i++)
 		{
-			rawData.Add(new GlobalData()
+			rawData.Add(new GlobalDownloadMappingData()
 			{
-				Id = i,
-				Name = $"Name {i}",
-				Description = $"Description for record {i}",
-				Description2 = $"Description2 for record {i}",
-				Description3 = $"Description3 for record {i}",
-				Description4 = $"Description4 for record {i}",
-				Description5 = $"Description5 for record {i}",
-				Description6 = $"Description6 for record {i}",
-				Description7 = $"Description7 for record {i}",
-				Description8 = $"Description8 for record {i}",
-
+				Date = new DateTime(2025, 01, 21),
+				HSCode = $"HSCode {i}",
+				ProductDescription = $"ProductDescription for record {i}",
+				Importer = $"Test Importer for record {i}",
+				Exporter = $"Test Exporter for record {i}",
+				RelatedParty = $"Test RelatedParty for record {i}",
+				StdQty = 157,
+				StdUnit = $"UNT {i}",
+				GrossWeight = 100 + i,
+				Quantity = 500 + i,
+				UnitRateUSD = 2 + i,
+				QuantityUnit = "Package",
+				Value = 3504 + i,
+				OriginCountry = "China",
+				DestinationCountry = "Test Destination",
+				DestinationPort = "N/A",
+				BillLadingNo = "N/A",
+				Mode = "Air",
+				Measurment = "N/A",
+				Tax = "-",
+				DeliveryPortNameNew = "-",
+				TEU = "-",
+				FreightTermNew = "-",
+				MarksNumber = "-",
+				ImporterAdd1 = $"Test Address {i}",
+				ExporterAdd1 = $"Test Exp Address {i}",
+				RelatedPartyAdd1 = $"Related Party Add - {i}",
+				HS4HS8Description = $"HS 4 or HS 8 Desc {i}",
+				CountryName = $"Main Country Source {i}"
 			});
 		}
 
@@ -52,17 +70,11 @@ app.MapGet("/generate-workbook/{templateType?}", async (HttpContext context, str
 		using (Workbook workbook = new Workbook())
 		{
 			Worksheet worksheet;
-			// Create an instance of XlsxLoadOptions
-			//var options = new XlsxLoadOptions
-			//{
-			//	UseBufferedStreaming = true, // Enable buffered streaming
-			//	BufferSize = 8192           // Set the buffer size (in bytes) for optimized loading
-			//};
 			if (templateType.Equals("template-based"))
 			{
-				logger.Trace($"worksheet.LoadDocument Started for TemplateType = {templateType}.");
+				logger.Trace($"workbook.LoadDocument Started for TemplateType = {templateType}.");
 				workbook.LoadDocument(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "RawData.xlsx"));
-				logger.Trace($"worksheet.LoadDocument Completed for TemplateType = {templateType}.");
+				logger.Trace($"workbook.LoadDocument Completed for TemplateType = {templateType}.");
 				workbook.BeginUpdate();
 				worksheet = workbook.Worksheets[2];
 			}
