@@ -126,19 +126,16 @@ app.MapGet("/generate-workbook/{templateType?}", async (HttpContext context, str
 			workbook.Calculate();
 			workbook.EndUpdate();
 			logger.Trace($"workbook.SaveDocument Started for TemplateType = {templateType}.");
-			using (var ms = new MemoryStream())
-			{
-				workbook.SaveDocument(ms, DocumentFormat.Xlsx);
-				workbook.Dispose();
-				ms.Seek(0, SeekOrigin.Begin);
+			var data = await workbook.SaveDocumentAsync(DocumentFormat.Xlsx);
+			workbook.Dispose();
+			logger.Trace("Data saved to stream/ byte array");
 
-				context.Response.Clear();
-				context.Response.Headers["Content-Disposition"] = $"attachment; filename={fileName}";
-				context.Response.ContentType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+			context.Response.Clear();
+			context.Response.Headers["Content-Disposition"] = $"attachment; filename={fileName}";
+			context.Response.ContentType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
 
-				logger.Trace($"Writing workbook {fileName} to response for TemplateType = {templateType}.");
-				await ms.CopyToAsync(context.Response.Body);
-			}
+			logger.Trace($"Writing workbook {fileName} to response for TemplateType = {templateType}.");
+			await context.Response.Body.WriteAsync(data, 0, data.Length);
 		}
 	}
 	catch (Exception ex)
