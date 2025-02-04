@@ -88,11 +88,18 @@ app.MapGet("/generate-workbook/{templateType?}", async (HttpContext context, str
 				foreach (var item in columns)
 				{
 					worksheet[1, index].SetValue(item);
-					worksheet[1, index].Fill.BackgroundColor = System.Drawing.ColorTranslator.FromHtml("#16365c");
+					/*worksheet[1, index].Fill.BackgroundColor = System.Drawing.ColorTranslator.FromHtml("#16365c");
 					worksheet[1, index].Font.Color = System.Drawing.ColorTranslator.FromHtml("#fff");
-					worksheet[1, index].Font.Bold = true;
+					worksheet[1, index].Font.Bold = true;*/
 					index++;
 				}
+				Style customStyle = workbook.Styles.Add("CustomStyle");
+				customStyle.Font.Color = System.Drawing.ColorTranslator.FromHtml("#fff");
+				customStyle.Font.Bold = true;
+				customStyle.Fill.BackgroundColor = System.Drawing.ColorTranslator.FromHtml("#16365c");
+
+				CellRange range = worksheet.Range["A2:AD2"];
+				range.Style = customStyle;
 				worksheet.Columns[index - 1].WidthInPixels = 100;
 				worksheet.Cells.Alignment.WrapText = true;
 			}
