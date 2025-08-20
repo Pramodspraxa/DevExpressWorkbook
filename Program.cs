@@ -142,7 +142,9 @@ app.MapGet("/generate-workbook/{templateType?}", async (HttpContext context, str
 	{
 		logger.Error(ex, "Error occurred while generating the workbook.");
 		context.Response.StatusCode = StatusCodes.Status500InternalServerError;
-		await context.Response.WriteAsync("An error occurred while processing your request.");
+		// For debugging only — send full exception to client
+    	await context.Response.WriteAsync($"Error occurred while generating the workbook: {ex.Message}\n{ex.StackTrace}");
+		// await context.Response.WriteAsync("An error occurred while processing your request.");
 	}
 });
 
