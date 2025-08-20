@@ -18,23 +18,23 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Reference Include="DevExpress.Data.v23.1">
-      <HintPath>references\DevExpress.23.1\DevExpress.Data.v23.1.dll</HintPath>
+    <Reference Include="DevExpress.Data.v25.1">
+      <HintPath>references\DevExpress.25.1\DevExpress.Data.v25.1.dll</HintPath>
     </Reference>
-    <Reference Include="DevExpress.Docs.v23.1">
-      <HintPath>references\DevExpress.23.1\DevExpress.Docs.v23.1.dll</HintPath>
+    <Reference Include="DevExpress.Docs.v25.1">
+      <HintPath>references\DevExpress.25.1\DevExpress.Docs.v25.1.dll</HintPath>
     </Reference>
-    <Reference Include="DevExpress.Drawing.v23.1.Skia">
-      <HintPath>references\DevExpress.23.1\DevExpress.Drawing.v23.1.Skia.dll</HintPath>
+    <Reference Include="DevExpress.Drawing.v25.1.Skia">
+      <HintPath>references\DevExpress.25.1\DevExpress.Drawing.v25.1.Skia.dll</HintPath>
     </Reference>
-    <Reference Include="DevExpress.Office.v23.1.Core">
-      <HintPath>references\DevExpress.23.1\DevExpress.Office.v23.1.Core.dll</HintPath>
+    <Reference Include="DevExpress.Office.v25.1.Core">
+      <HintPath>references\DevExpress.25.1\DevExpress.Office.v25.1.Core.dll</HintPath>
     </Reference>
-    <Reference Include="DevExpress.Printing.v23.1.Core">
-      <HintPath>references\DevExpress.23.1\DevExpress.Printing.v23.1.Core.dll</HintPath>
+    <Reference Include="DevExpress.Printing.v25.1.Core">
+      <HintPath>references\DevExpress.25.1\DevExpress.Printing.v25.1.Core.dll</HintPath>
     </Reference>
-    <Reference Include="DevExpress.Spreadsheet.v23.1.Core">
-      <HintPath>references\DevExpress.23.1\DevExpress.Spreadsheet.v23.1.Core.dll</HintPath>
+    <Reference Include="DevExpress.Spreadsheet.v25.1.Core">
+      <HintPath>references\DevExpress.25.1\DevExpress.Spreadsheet.v25.1.Core.dll</HintPath>
     </Reference>
     <Reference Include="NLogExtensions">
       <HintPath>references\NLogExtensions.dll</HintPath>
