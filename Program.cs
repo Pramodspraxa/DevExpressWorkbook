@@ -2,85 +2,34 @@ using DevExpress.Spreadsheet;
 using DevExpressWorkbookApi;
 using NLog;
 using NLog.Extensions.Logging;
-using System.Diagnostics;
+using DevExpress.Drawing;
+using DevExpress.Spreadsheet;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Logging.ClearProviders();
 builder.Logging.AddNLog();
 
-try
-{
-	LogManager.LoadConfiguration("NLog.config");
-	Console.WriteLine("NLog configuration loaded successfully");
-}
-catch (Exception ex)
-{
-	Console.WriteLine($"Failed to load NLog configuration: {ex.Message}");
-	Console.WriteLine($"Exception: {ex}");
-}
+LogManager.LoadConfiguration("NLog.config");
 
 var app = builder.Build();
 var logger = LogManager.GetCurrentClassLogger();
 
-// Debug logging setup
-Console.WriteLine($"Current Directory: {Directory.GetCurrentDirectory()}");
-Console.WriteLine($"Base Directory: {AppDomain.CurrentDomain.BaseDirectory}");
-Console.WriteLine($"NLog Configuration Loaded: {LogManager.Configuration != null}");
-
-// Ensure logs directory exists
-var logsPath = Path.Combine(Directory.GetCurrentDirectory(), "logs");
-try
-{
-	if (!Directory.Exists(logsPath))
-	{
-		Directory.CreateDirectory(logsPath);
-		Console.WriteLine($"Created logs directory: {logsPath}");
-	}
-	else
-	{
-		Console.WriteLine($"Logs directory exists: {logsPath}");
-	}
-	
-	// Check permissions by creating a test file
-	var testFile = Path.Combine(logsPath, "test.txt");
-	File.WriteAllText(testFile, "test");
-	File.Delete(testFile);
-	Console.WriteLine("Directory permissions OK");
-}
-catch (Exception ex)
-{
-	Console.WriteLine($"Directory/permission issue: {ex.Message}");
-}
-
-// Test logging immediately
-logger.Info("Application started - testing logging functionality");
-logger.Trace("This is a trace message to test file logging");
-Console.WriteLine("Logger test messages sent");
+// DXSettings.DrawingEngine = DrawingEngine.Skia;
 
 // Endpoint to create a new workbook
 app.MapGet("/generate-workbook/{templateType?}", async (HttpContext context, string? templateType) =>
 {
-	// Force immediate console output
-	Console.WriteLine($"=== REQUEST RECEIVED at {DateTime.Now:yyyy-MM-dd HH:mm:ss.fff} ===");
-	Console.WriteLine($"Template Type: {templateType}");
-	Console.Out.Flush();
-	
 	try
 	{
 		var columns = new string[30] { "Date", "HSCode", "ProductDescription", "Importer", "Exporter", "RelatedParty", "StdQty", "StdUnit", "GrossWeight", "Quantity", "UnitRateUSD", "QuantityUnit", "Value", "OriginCountry", "OriginPort", "DestinationCountry", "DestinationPort", "BillLadingNo", "Mode", "Measurment", "Tax", "DeliveryPortNameNew", "TEU", "FreightTermNew", "MarksNumber", "ImporterAdd1", "ExporterAdd1", "RelatedPartyAdd1", "HS4HS8Description", "CountryName" };
 		int ChunkSize = 5000;
 		int totalRecords = 60000;
-		string fileName = "SampleData.xlsx";
+		string fileName = "SampleData25.xlsx";
 
-		var totalStopwatch = Stopwatch.StartNew();
 		templateType = string.IsNullOrWhiteSpace(templateType) ? "new" : "template-based";
-		
-		Console.WriteLine($"STARTING: Workbook generation for TemplateType = {templateType}");
-		Console.Out.Flush();
-		logger.Trace($"[{totalStopwatch.Elapsed.ToString(@"mm\:ss\.fff")}] Starting workbook generation for TemplateType = {templateType}");
+		logger.Trace($"Starting workbook generation for TemplateType = {templateType}");
 
-		var stepStopwatch = Stopwatch.StartNew();
 		var rawData = new List<GlobalDownloadMappingData>();
 
 		for (int i = 1; i <= totalRecords; i++)
@@ -119,11 +68,7 @@ app.MapGet("/generate-workbook/{templateType?}", async (HttpContext context, str
 			});
 		}
 
-		stepStopwatch.Stop();
-		Console.WriteLine($"DATA GENERATED: {stepStopwatch.Elapsed.ToString(@"mm\:ss\.fff")} | Total: {totalStopwatch.Elapsed.ToString(@"mm\:ss\.fff")}");
-		Console.Out.Flush();
-		logger.Trace($"[{totalStopwatch.Elapsed.ToString(@"mm\:ss\.fff")}] Dummy data generated in {stepStopwatch.Elapsed.ToString(@"mm\:ss\.fff")}. Populating workbook for TemplateType = {templateType}");
-		stepStopwatch.Restart();
+		logger.Trace($"Dummy data generated. Populating workbook for TemplateType = {templateType}");
 		bool applyFormatting = true;
 		// Create a new workbook
 		using (Workbook workbook = new Workbook())
@@ -131,13 +76,9 @@ app.MapGet("/generate-workbook/{templateType?}", async (HttpContext context, str
 			Worksheet worksheet;
 			if (templateType.Equals("template-based"))
 			{
-				logger.Trace($"[{totalStopwatch.Elapsed.ToString(@"mm\:ss\.fff")}] workbook.LoadDocument Started for TemplateType = {templateType}.");
-				Console.WriteLine("Worksheet load started");
-				var loadStopwatch = Stopwatch.StartNew();
+				logger.Trace($"workbook.LoadDocument Started for TemplateType = {templateType}.");
 				workbook.LoadDocument(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "RawData.xlsx"));
-				loadStopwatch.Stop();
-				Console.WriteLine($"Workbook loaded");
-				logger.Trace($"[{totalStopwatch.Elapsed.ToString(@"mm\:ss\.fff")}] workbook.LoadDocument Completed in {loadStopwatch.Elapsed.ToString(@"mm\:ss\.fff")} for TemplateType = {templateType}.");
+				logger.Trace($"workbook.LoadDocument Completed for TemplateType = {templateType}.");
 				workbook.BeginUpdate();
 				worksheet = workbook.Worksheets[2];
 			}
@@ -146,11 +87,8 @@ app.MapGet("/generate-workbook/{templateType?}", async (HttpContext context, str
 				worksheet = workbook.Worksheets[0];
 			}
 			int index = 0;
-			Console.WriteLine($"Worksheet count -> {workbook.Worksheets.Count}");
 			if (applyFormatting)
 			{
-				logger.Trace($"[{totalStopwatch.Elapsed.ToString(@"mm\:ss\.fff")}] Starting header formatting");
-				var formatStopwatch = Stopwatch.StartNew();
 				foreach (var item in columns)
 				{
 					worksheet[1, index].SetValue(item);
@@ -168,68 +106,40 @@ app.MapGet("/generate-workbook/{templateType?}", async (HttpContext context, str
 				range.Style = customStyle;
 				worksheet.Columns[index - 1].WidthInPixels = 100;
 				worksheet.Cells.Alignment.WrapText = true;
-				formatStopwatch.Stop();
-				logger.Trace($"[{totalStopwatch.Elapsed.ToString(@"mm\:ss\.fff")}] Header formatting completed in {formatStopwatch.Elapsed.ToString(@"mm\:ss\.fff")}");
 			}
 			int rowIndex = 2; // Start from row 2 since row 1 is header
 			int rawDataCount = rawData.Count;
-			logger.Trace($"[{totalStopwatch.Elapsed.ToString(@"mm\:ss\.fff")}] worksheet.Import Started for TemplateType = {templateType}. Processing {rawDataCount} records in chunks of {ChunkSize}.");
-			var importStopwatch = Stopwatch.StartNew();
+			logger.Trace($"worksheet.Import Started for TemplateType = {templateType}.");
 			for (int i = 0; i < rawDataCount; i += ChunkSize)
 			{
-				var chunkStopwatch = Stopwatch.StartNew();
 				var chunk = rawData.Skip(i).Take(ChunkSize);
 				using (var reader = FastMember.ObjectReader.Create(chunk, columns))
 				{
 					worksheet.Import(reader, false, rowIndex, 0);
 				}
 				rowIndex += chunk.Count();
-				chunkStopwatch.Stop();
-				logger.Trace($"[{totalStopwatch.Elapsed.ToString(@"mm\:ss\.fff")}] Processed chunk {(i / ChunkSize) + 1}/{(rawDataCount + ChunkSize - 1) / ChunkSize} ({chunk.Count()} records) in {chunkStopwatch.Elapsed.ToString(@"mm\:ss\.fff")}");
 			}
-			importStopwatch.Stop();
-			Console.WriteLine($"IMPORT COMPLETED: {importStopwatch.Elapsed.ToString(@"mm\:ss\.fff")} | Total: {totalStopwatch.Elapsed.ToString(@"mm\:ss\.fff")}");
-			Console.Out.Flush();
-			logger.Trace($"[{totalStopwatch.Elapsed.ToString(@"mm\:ss\.fff")}] All data import completed in {importStopwatch.Elapsed.ToString(@"mm\:ss\.fff")}");
-			
 			if (applyFormatting)
 			{
-				var postFormatStopwatch = Stopwatch.StartNew();
 				worksheet.Columns["A"].NumberFormat = "dd-MMM-yyyy";
 				DevExpress.Spreadsheet.CellRange rangeFilter = worksheet.Range["A2:AD2"];
 				worksheet.AutoFilter.Apply(rangeFilter);
-				postFormatStopwatch.Stop();
-				logger.Trace($"[{totalStopwatch.Elapsed.ToString(@"mm\:ss\.fff")}] Post-import formatting completed in {postFormatStopwatch.Elapsed.ToString(@"mm\:ss\.fff")}");
 			}
+			logger.Trace($"worksheet.Import Completed for TemplateType = {templateType}.");
 			rawData = null;
-			
-			var calcStopwatch = Stopwatch.StartNew();
 			workbook.Calculate();
-			calcStopwatch.Stop();
-			logger.Trace($"[{totalStopwatch.Elapsed.ToString(@"mm\:ss\.fff")}] Workbook calculation completed in {calcStopwatch.Elapsed.ToString(@"mm\:ss\.fff")}");
-			
 			workbook.EndUpdate();
-			logger.Trace($"[{totalStopwatch.Elapsed.ToString(@"mm\:ss\.fff")}] workbook.SaveDocument Started for TemplateType = {templateType}.");
-			var saveStopwatch = Stopwatch.StartNew();
+			logger.Trace($"workbook.SaveDocument Started for TemplateType = {templateType}.");
 			var data = await workbook.SaveDocumentAsync(DocumentFormat.Xlsx);
-			saveStopwatch.Stop();
 			workbook.Dispose();
-			Console.WriteLine($"SAVE COMPLETED: {saveStopwatch.Elapsed.ToString(@"mm\:ss\.fff")} | Total: {totalStopwatch.Elapsed.ToString(@"mm\:ss\.fff")}");
-			Console.Out.Flush();
-			logger.Trace($"[{totalStopwatch.Elapsed.ToString(@"mm\:ss\.fff")}] Data saved to stream/byte array in {saveStopwatch.Elapsed.ToString(@"mm\:ss\.fff")}");
+			logger.Trace("Data saved to stream/ byte array");
 
 			context.Response.Clear();
 			context.Response.Headers["Content-Disposition"] = $"attachment; filename={fileName}";
 			context.Response.ContentType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
 
-			logger.Trace($"[{totalStopwatch.Elapsed.ToString(@"mm\:ss\.fff")}] Writing workbook {fileName} to response for TemplateType = {templateType}.");
-			var responseStopwatch = Stopwatch.StartNew();
+			logger.Trace($"Writing workbook {fileName} to response for TemplateType = {templateType}.");
 			await context.Response.Body.WriteAsync(data, 0, data.Length);
-			responseStopwatch.Stop();
-			totalStopwatch.Stop();
-			Console.WriteLine($"=== COMPLETED: Total execution time: {totalStopwatch.Elapsed.ToString(@"mm\:ss\.fff")} ===");
-			Console.Out.Flush();
-			logger.Trace($"[{totalStopwatch.Elapsed.ToString(@"mm\:ss\.fff")}] Response written in {responseStopwatch.Elapsed.ToString(@"mm\:ss\.fff")}. Total execution time: {totalStopwatch.Elapsed.ToString(@"mm\:ss\.fff")}");
 		}
 	}
 	catch (Exception ex)
