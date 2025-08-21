@@ -2,8 +2,6 @@ using DevExpress.Spreadsheet;
 using DevExpressWorkbookApi;
 using NLog;
 using NLog.Extensions.Logging;
-using DevExpress.Drawing;
-using DevExpress.Spreadsheet;
 using DevExpress.Utils;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -74,9 +72,7 @@ app.MapGet("/generate-workbook/{templateType?}", async (HttpContext context, str
 		// Create a new workbook
 		using (Workbook workbook = new Workbook())
 		{
-			workbook.Options.CalculationMode = WorkbookCalculationMode.Manual;
-			workbook.DocumentSettings.Calculation.RecalculateBeforeSaving = false;
-
+	
 			Worksheet worksheet;
 			if (templateType.Equals("template-based"))
 			{
