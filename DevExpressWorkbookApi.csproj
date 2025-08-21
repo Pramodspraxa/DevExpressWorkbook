@@ -33,6 +33,9 @@
     <Reference Include="DevExpress.Printing.v25.1.Core">
       <HintPath>references\DevExpress.25.1\DevExpress.Printing.v25.1.Core.dll</HintPath>
     </Reference>
+    <Reference Include="DevExpress.Utils.v25.1">
+      <HintPath>references\DevExpress.25.1\DevExpress.Utils.v25.1.dll</HintPath>
+    </Reference>
     <Reference Include="DevExpress.Spreadsheet.v25.1.Core">
       <HintPath>references\DevExpress.25.1\DevExpress.Spreadsheet.v25.1.Core.dll</HintPath>
     </Reference>
