@@ -145,8 +145,8 @@ app.MapGet("/generate-workbook/{templateType?}", async (HttpContext context, str
 
 				worksheet.Cells.Alignment.WrapText = true;
 
-				DevExpress.Spreadsheet.CellRange rangeFilter = worksheet.Range["A2:AD2"];
-				worksheet.AutoFilter.Apply(rangeFilter);
+				// DevExpress.Spreadsheet.CellRange rangeFilter = worksheet.Range["A2:AD2"];
+				// worksheet.AutoFilter.Apply(rangeFilter);
 			}
 			logger.Trace($"worksheet.Import Completed for TemplateType = {templateType}.");
 			rawData = null;
