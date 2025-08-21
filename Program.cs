@@ -2,7 +2,6 @@ using DevExpress.Spreadsheet;
 using DevExpressWorkbookApi;
 using NLog;
 using NLog.Extensions.Logging;
-using DevExpress.Drawing;
 using DevExpress.Utils;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -15,7 +14,7 @@ LogManager.LoadConfiguration("NLog.config");
 var app = builder.Build();
 var logger = LogManager.GetCurrentClassLogger();
 
-// DXSettings.DrawingEngine = DrawingEngine.Skia;
+//DXSettings.DrawingEngine = DrawingEngine.Skia;
 
 // Endpoint to create a new workbook
 app.MapGet("/generate-workbook/{templateType?}", async (HttpContext context, string? templateType) =>
@@ -87,26 +86,46 @@ app.MapGet("/generate-workbook/{templateType?}", async (HttpContext context, str
 				worksheet = workbook.Worksheets[0];
 			}
 			int index = 0;
-			if (applyFormatting)
+			if (1 == 2)
 			{
 				foreach (var item in columns)
 				{
 					worksheet[1, index].SetValue(item);
-					worksheet[1, index].Fill.BackgroundColor = DXColor.FromHtml("#16365c");
-					worksheet[1, index].Font.Color = DXColor.FromHtml("#fff");
+					worksheet[1, index].Fill.BackgroundColor = System.Drawing.ColorTranslator.FromHtml("#16365c");
+					worksheet[1, index].Font.Color = System.Drawing.ColorTranslator.FromHtml("#fff");
 					worksheet[1, index].Font.Bold = true;
 					index++;
 				}
 				Style customStyle = workbook.Styles.Add("CustomStyle");
-				customStyle.Font.Color = DXColor.FromHtml("#fff");
+				customStyle.Font.Color = System.Drawing.ColorTranslator.FromHtml("#fff");
 				customStyle.Font.Bold = true;
-				customStyle.Fill.BackgroundColor = DXColor.FromHtml("#16365c");
+				customStyle.Fill.BackgroundColor = System.Drawing.ColorTranslator.FromHtml("#16365c");
 
 				CellRange range = worksheet.Range["A2:AD2"];
 				range.Style = customStyle;
 				worksheet.Columns[index - 1].WidthInPixels = 100;
 				worksheet.Cells.Alignment.WrapText = true;
 			}
+
+			// Add column headers
+			for (int i = 0; i < columns.Length; i++)
+			{
+				worksheet[1, i].SetValue(columns[i]);
+			}
+
+			if(applyFormatting)
+			{
+				// 2) Header style once (no per-cell loop)
+                		var navy = DXColor.FromHtml("#16365c");
+                		var white = DXColor.FromHtml("#ffffff");
+                		var header = worksheet.Range.FromLTRB(0, 1, columns.Length - 1, 1); // A2:AD2
+                		var s = workbook.Styles.Add("Header");
+                		s.Fill.BackgroundColor = navy;
+                		s.Font.Color = white;
+                		s.Font.Bold = true;
+                		header.Style = s;
+			}
+
 			int rowIndex = 2; // Start from row 2 since row 1 is header
 			int rawDataCount = rawData.Count;
 			logger.Trace($"worksheet.Import Started for TemplateType = {templateType}.");
@@ -122,6 +141,10 @@ app.MapGet("/generate-workbook/{templateType?}", async (HttpContext context, str
 			if (applyFormatting)
 			{
 				worksheet.Columns["A"].NumberFormat = "dd-MMM-yyyy";
+				worksheet.AutoFilter.Apply(worksheet.Range.FromLTRB(0, 1, columns.Length - 1, 1));
+
+				worksheet.Cells.Alignment.WrapText = true;
+
 				DevExpress.Spreadsheet.CellRange rangeFilter = worksheet.Range["A2:AD2"];
 				worksheet.AutoFilter.Apply(rangeFilter);
 			}
