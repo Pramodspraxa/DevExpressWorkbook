@@ -142,7 +142,7 @@ app.MapGet("/generate-workbook/{templateType?}", async (HttpContext context, str
 				worksheet.Columns["A"].NumberFormat = "dd-MMM-yyyy";
 				worksheet.AutoFilter.Apply(worksheet.Range.FromLTRB(0, 1, columns.Length - 1, 1));
 
-				worksheet.Cells.Alignment.WrapText = true;
+				// worksheet.Cells.Alignment.WrapText = true;
 
 				//DevExpress.Spreadsheet.CellRange rangeFilter = worksheet.Range["A2:AD2"];
 				//worksheet.AutoFilter.Apply(rangeFilter);
