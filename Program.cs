@@ -2,6 +2,8 @@ using DevExpress.Spreadsheet;
 using DevExpressWorkbookApi;
 using NLog;
 using NLog.Extensions.Logging;
+using DevExpress.Drawing;
+using DevExpress.Spreadsheet;
 using DevExpress.Utils;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -74,6 +76,7 @@ app.MapGet("/generate-workbook/{templateType?}", async (HttpContext context, str
 		{
 			workbook.Options.CalculationMode = WorkbookCalculationMode.Manual;
 			workbook.DocumentSettings.Calculation.RecalculateBeforeSaving = false;
+
 			Worksheet worksheet;
 			if (templateType.Equals("template-based"))
 			{
@@ -109,12 +112,6 @@ app.MapGet("/generate-workbook/{templateType?}", async (HttpContext context, str
 				worksheet.Cells.Alignment.WrapText = true;
 			}
 
-			// Add column headers
-			for (int i = 0; i < columns.Length; i++)
-			{
-				worksheet[1, i].SetValue(columns[i]);
-			}
-
 			if(applyFormatting)
 			{
 				// 2) Header style once (no per-cell loop)
@@ -147,8 +144,8 @@ app.MapGet("/generate-workbook/{templateType?}", async (HttpContext context, str
 
 				worksheet.Cells.Alignment.WrapText = true;
 
-				// DevExpress.Spreadsheet.CellRange rangeFilter = worksheet.Range["A2:AD2"];
-				// worksheet.AutoFilter.Apply(rangeFilter);
+				//DevExpress.Spreadsheet.CellRange rangeFilter = worksheet.Range["A2:AD2"];
+				//worksheet.AutoFilter.Apply(rangeFilter);
 			}
 			logger.Trace($"worksheet.Import Completed for TemplateType = {templateType}.");
 			rawData = null;
