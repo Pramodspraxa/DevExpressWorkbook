@@ -61,15 +61,23 @@ Console.WriteLine("Logger test messages sent");
 // Endpoint to create a new workbook
 app.MapGet("/generate-workbook/{templateType?}", async (HttpContext context, string? templateType) =>
 {
+	// Force immediate console output
+	Console.WriteLine($"=== REQUEST RECEIVED at {DateTime.Now:yyyy-MM-dd HH:mm:ss.fff} ===");
+	Console.WriteLine($"Template Type: {templateType}");
+	Console.Out.Flush();
+	
 	try
 	{
 		var columns = new string[30] { "Date", "HSCode", "ProductDescription", "Importer", "Exporter", "RelatedParty", "StdQty", "StdUnit", "GrossWeight", "Quantity", "UnitRateUSD", "QuantityUnit", "Value", "OriginCountry", "OriginPort", "DestinationCountry", "DestinationPort", "BillLadingNo", "Mode", "Measurment", "Tax", "DeliveryPortNameNew", "TEU", "FreightTermNew", "MarksNumber", "ImporterAdd1", "ExporterAdd1", "RelatedPartyAdd1", "HS4HS8Description", "CountryName" };
 		int ChunkSize = 5000;
 		int totalRecords = 60000;
-		string fileName = "SampleData25.xlsx";
+		string fileName = "SampleData.xlsx";
 
 		var totalStopwatch = Stopwatch.StartNew();
 		templateType = string.IsNullOrWhiteSpace(templateType) ? "new" : "template-based";
+		
+		Console.WriteLine($"STARTING: Workbook generation for TemplateType = {templateType}");
+		Console.Out.Flush();
 		logger.Trace($"[{totalStopwatch.Elapsed.ToString(@"mm\:ss\.fff")}] Starting workbook generation for TemplateType = {templateType}");
 
 		var stepStopwatch = Stopwatch.StartNew();
@@ -112,6 +120,8 @@ app.MapGet("/generate-workbook/{templateType?}", async (HttpContext context, str
 		}
 
 		stepStopwatch.Stop();
+		Console.WriteLine($"DATA GENERATED: {stepStopwatch.Elapsed.ToString(@"mm\:ss\.fff")} | Total: {totalStopwatch.Elapsed.ToString(@"mm\:ss\.fff")}");
+		Console.Out.Flush();
 		logger.Trace($"[{totalStopwatch.Elapsed.ToString(@"mm\:ss\.fff")}] Dummy data generated in {stepStopwatch.Elapsed.ToString(@"mm\:ss\.fff")}. Populating workbook for TemplateType = {templateType}");
 		stepStopwatch.Restart();
 		bool applyFormatting = true;
@@ -178,6 +188,8 @@ app.MapGet("/generate-workbook/{templateType?}", async (HttpContext context, str
 				logger.Trace($"[{totalStopwatch.Elapsed.ToString(@"mm\:ss\.fff")}] Processed chunk {(i / ChunkSize) + 1}/{(rawDataCount + ChunkSize - 1) / ChunkSize} ({chunk.Count()} records) in {chunkStopwatch.Elapsed.ToString(@"mm\:ss\.fff")}");
 			}
 			importStopwatch.Stop();
+			Console.WriteLine($"IMPORT COMPLETED: {importStopwatch.Elapsed.ToString(@"mm\:ss\.fff")} | Total: {totalStopwatch.Elapsed.ToString(@"mm\:ss\.fff")}");
+			Console.Out.Flush();
 			logger.Trace($"[{totalStopwatch.Elapsed.ToString(@"mm\:ss\.fff")}] All data import completed in {importStopwatch.Elapsed.ToString(@"mm\:ss\.fff")}");
 			
 			if (applyFormatting)
@@ -202,6 +214,8 @@ app.MapGet("/generate-workbook/{templateType?}", async (HttpContext context, str
 			var data = await workbook.SaveDocumentAsync(DocumentFormat.Xlsx);
 			saveStopwatch.Stop();
 			workbook.Dispose();
+			Console.WriteLine($"SAVE COMPLETED: {saveStopwatch.Elapsed.ToString(@"mm\:ss\.fff")} | Total: {totalStopwatch.Elapsed.ToString(@"mm\:ss\.fff")}");
+			Console.Out.Flush();
 			logger.Trace($"[{totalStopwatch.Elapsed.ToString(@"mm\:ss\.fff")}] Data saved to stream/byte array in {saveStopwatch.Elapsed.ToString(@"mm\:ss\.fff")}");
 
 			context.Response.Clear();
@@ -213,6 +227,8 @@ app.MapGet("/generate-workbook/{templateType?}", async (HttpContext context, str
 			await context.Response.Body.WriteAsync(data, 0, data.Length);
 			responseStopwatch.Stop();
 			totalStopwatch.Stop();
+			Console.WriteLine($"=== COMPLETED: Total execution time: {totalStopwatch.Elapsed.ToString(@"mm\:ss\.fff")} ===");
+			Console.Out.Flush();
 			logger.Trace($"[{totalStopwatch.Elapsed.ToString(@"mm\:ss\.fff")}] Response written in {responseStopwatch.Elapsed.ToString(@"mm\:ss\.fff")}. Total execution time: {totalStopwatch.Elapsed.ToString(@"mm\:ss\.fff")}");
 		}
 	}
