@@ -9,10 +9,54 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Logging.ClearProviders();
 builder.Logging.AddNLog();
 
-LogManager.LoadConfiguration("NLog.config");
+try
+{
+	LogManager.LoadConfiguration("NLog.config");
+	Console.WriteLine("NLog configuration loaded successfully");
+}
+catch (Exception ex)
+{
+	Console.WriteLine($"Failed to load NLog configuration: {ex.Message}");
+	Console.WriteLine($"Exception: {ex}");
+}
 
 var app = builder.Build();
 var logger = LogManager.GetCurrentClassLogger();
+
+// Debug logging setup
+Console.WriteLine($"Current Directory: {Directory.GetCurrentDirectory()}");
+Console.WriteLine($"Base Directory: {AppDomain.CurrentDomain.BaseDirectory}");
+Console.WriteLine($"NLog Configuration Loaded: {LogManager.Configuration != null}");
+
+// Ensure logs directory exists
+var logsPath = Path.Combine(Directory.GetCurrentDirectory(), "logs");
+try
+{
+	if (!Directory.Exists(logsPath))
+	{
+		Directory.CreateDirectory(logsPath);
+		Console.WriteLine($"Created logs directory: {logsPath}");
+	}
+	else
+	{
+		Console.WriteLine($"Logs directory exists: {logsPath}");
+	}
+	
+	// Check permissions by creating a test file
+	var testFile = Path.Combine(logsPath, "test.txt");
+	File.WriteAllText(testFile, "test");
+	File.Delete(testFile);
+	Console.WriteLine("Directory permissions OK");
+}
+catch (Exception ex)
+{
+	Console.WriteLine($"Directory/permission issue: {ex.Message}");
+}
+
+// Test logging immediately
+logger.Info("Application started - testing logging functionality");
+logger.Trace("This is a trace message to test file logging");
+Console.WriteLine("Logger test messages sent");
 
 // Endpoint to create a new workbook
 app.MapGet("/generate-workbook/{templateType?}", async (HttpContext context, string? templateType) =>
