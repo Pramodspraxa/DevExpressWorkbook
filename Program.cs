@@ -112,17 +112,23 @@ app.MapGet("/generate-workbook/{templateType?}", async (HttpContext context, str
 				worksheet.Cells.Alignment.WrapText = true;
 			}
 
-			if(applyFormatting)
+			// Add column headers
+			for (int i = 0; i < columns.Length; i++)
+			{
+				worksheet[1, i].SetValue(columns[i]);
+			}
+
+			if (applyFormatting)
 			{
 				// 2) Header style once (no per-cell loop)
-                		var navy = DXColor.FromHtml("#16365c");
-                		var white = DXColor.FromHtml("#ffffff");
-                		var header = worksheet.Range.FromLTRB(0, 1, columns.Length - 1, 1); // A2:AD2
-                		var s = workbook.Styles.Add("Header");
-                		s.Fill.BackgroundColor = navy;
-                		s.Font.Color = white;
-                		s.Font.Bold = true;
-                		header.Style = s;
+				var navy = DXColor.FromHtml("#16365c");
+				var white = DXColor.FromHtml("#ffffff");
+				var header = worksheet.Range.FromLTRB(0, 1, columns.Length - 1, 1); // A2:AD2
+				var s = workbook.Styles.Add("Header");
+				s.Fill.BackgroundColor = navy;
+				s.Font.Color = white;
+				s.Font.Bold = true;
+				header.Style = s;
 			}
 
 			int rowIndex = 2; // Start from row 2 since row 1 is header
@@ -169,7 +175,7 @@ app.MapGet("/generate-workbook/{templateType?}", async (HttpContext context, str
 		logger.Error(ex, "Error occurred while generating the workbook.");
 		context.Response.StatusCode = StatusCodes.Status500InternalServerError;
 		// For debugging only — send full exception to client
-    	await context.Response.WriteAsync($"Error occurred while generating the workbook: {ex.Message}\n{ex.StackTrace}");
+		await context.Response.WriteAsync($"Error occurred while generating the workbook: {ex.Message}\n{ex.StackTrace}");
 		// await context.Response.WriteAsync("An error occurred while processing your request.");
 	}
 });
