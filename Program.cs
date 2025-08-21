@@ -72,6 +72,8 @@ app.MapGet("/generate-workbook/{templateType?}", async (HttpContext context, str
 		// Create a new workbook
 		using (Workbook workbook = new Workbook())
 		{
+			workbook.Options.CalculationMode = WorkbookCalculationMode.Manual;
+			workbook.DocumentSettings.Calculation.RecalculateBeforeSaving = false;
 			Worksheet worksheet;
 			if (templateType.Equals("template-based"))
 			{
@@ -108,10 +110,10 @@ app.MapGet("/generate-workbook/{templateType?}", async (HttpContext context, str
 			}
 
 			// Add column headers
-			// for (int i = 0; i < columns.Length; i++)
-			// {
-			// 	worksheet[1, i].SetValue(columns[i]);
-			// }
+			for (int i = 0; i < columns.Length; i++)
+			{
+				worksheet[1, i].SetValue(columns[i]);
+			}
 
 			if(applyFormatting)
 			{
