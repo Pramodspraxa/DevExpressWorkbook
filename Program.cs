@@ -73,7 +73,9 @@ app.MapGet("/generate-workbook/{templateType?}", async (HttpContext context, str
 			if (templateType.Equals("template-based"))
 			{
 				logger.Trace($"workbook.LoadDocument Started for TemplateType = {templateType}.");
+				Console.WriteLine("Worksheet load started");
 				workbook.LoadDocument(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "RawData.xlsx"));
+				Console.WriteLine($"Workbook loaded");
 				logger.Trace($"workbook.LoadDocument Completed for TemplateType = {templateType}.");
 				workbook.BeginUpdate();
 				worksheet = workbook.Worksheets[2];
@@ -83,6 +85,7 @@ app.MapGet("/generate-workbook/{templateType?}", async (HttpContext context, str
 				worksheet = workbook.Worksheets[0];
 			}
 			int index = 0;
+			Console.WriteLine($"Worksheet count -> {workbook.Worksheets.Count}");
 			if (applyFormatting)
 			{
 				foreach (var item in columns)
