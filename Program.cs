@@ -40,7 +40,7 @@ app.MapGet("/generate-workbook/{templateType?}", async (HttpContext context, str
 				ProductDescription = $"ProductDescription for record {i}",
 				Importer = $"Test Importer for record {i}",
 				Exporter = $"Test Exporter for record {i}",
-				RelatedParty = $"Test RelatedParty for record {i}",
+				RelatedParty = $"Test RelatedParty checking column auto adjust functionality in devexpress files asddTest RelatedParty checking column auto adjust functionality in devexpress files asddTest RelatedParty checking column auto adjust functionality in devexpress files asddTest RelatedParty checking column auto adjust functionality in devexpress files asddTest RelatedParty checking column auto adjust functionality in devexpress files asddTest RelatedParty checking column auto adjust functionality in devexpress files asddTest RelatedParty checking column auto adjust functionality in devexpress files asdd for record {i}",
 				StdQty = 157,
 				StdUnit = $"UNT {i}",
 				GrossWeight = 100 + i,
@@ -176,10 +176,20 @@ app.MapGet("/generate-workbook/{templateType?}", async (HttpContext context, str
 				// worksheet.Rows.AutoFit(0, rowIndex).Height = 40;
 				// worksheet.Rows[1].Height = 30; // Header row height
 
-				worksheet.Columns.AutoFit(0, columns.Length - 1);
+				// worksheet.Columns.AutoFit(0, columns.Length - 1);
+
+				// Ensure all rows have the correct height
+				// var heightRange = worksheet.Range[$"A1:A{rowIndex - 1}"];
+				// heightRange.RowHeight = 200;
 
 				// Fixed height for data rows (bulk)
-				// worksheet.Rows[2, rowIndex - 1].Height = 20;
+				//int lastRow = rowIndex - 1;
+				// worksheet.Rows.SetHeight(1, lastRow, 200);
+
+				worksheet.Columns["C"].Alignment.WrapText = true;
+				worksheet.Columns["D"].Alignment.WrapText = true;
+				worksheet.Columns["E"].Alignment.WrapText = true;
+				worksheet.Columns["F"].Alignment.WrapText = true;
 
 				worksheet.Columns["A"].NumberFormat = "dd-MMM-yyyy";
 				worksheet.AutoFilter.Apply(worksheet.Range.FromLTRB(0, 1, columns.Length - 1, 1));
