@@ -72,7 +72,7 @@ app.MapGet("/generate-workbook/{templateType?}", async (HttpContext context, str
 		// Create a new workbook
 		using (Workbook workbook = new Workbook())
 		{
-	
+
 			Worksheet worksheet;
 			if (templateType.Equals("template-based"))
 			{
@@ -143,8 +143,10 @@ app.MapGet("/generate-workbook/{templateType?}", async (HttpContext context, str
 			{
 				worksheet.Columns["A"].NumberFormat = "dd-MMM-yyyy";
 				worksheet.AutoFilter.Apply(worksheet.Range.FromLTRB(0, 1, columns.Length - 1, 1));
-
-				// worksheet.Cells.Alignment.WrapText = true;
+				// worksheet.DefaultRowHeight = 200;
+				int lastRow = rowIndex - 1; // rowIndex is already incremented after import
+				var dataRange = worksheet.Range.FromLTRB(0, 1, columns.Length - 1, lastRow); // A2:AD[lastRow]
+				dataRange.Alignment.WrapText = true;
 
 				//DevExpress.Spreadsheet.CellRange rangeFilter = worksheet.Range["A2:AD2"];
 				//worksheet.AutoFilter.Apply(rangeFilter);
