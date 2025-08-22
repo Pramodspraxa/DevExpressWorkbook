@@ -40,7 +40,7 @@ app.MapGet("/generate-workbook/{templateType?}", async (HttpContext context, str
 				ProductDescription = $"ProductDescription for record {i}",
 				Importer = $"Test Importer for record {i}",
 				Exporter = $"Test Exporter for record {i}",
-				RelatedParty = $"Test RelatedParty checking column auto adjust functionality in devexpress files asddTest RelatedParty checking column auto adjust functionality in devexpress files asddTest RelatedParty checking column auto adjust functionality in devexpress files asddTest RelatedParty checking column auto adjust functionality in devexpress files asddTest RelatedParty checking column auto adjust functionality in devexpress files asddTest RelatedParty checking column auto adjust functionality in devexpress files asddTest RelatedParty checking column auto adjust functionality in devexpress files asdd for record {i}",
+				RelatedParty = $"Test RelatedParty for record {i}",
 				StdQty = 157,
 				StdUnit = $"UNT {i}",
 				GrossWeight = 100 + i,
