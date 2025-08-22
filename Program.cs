@@ -150,26 +150,36 @@ app.MapGet("/generate-workbook/{templateType?}", async (HttpContext context, str
 				var dataRange = worksheet.Range.FromLTRB(0, 1, columns.Length - 1, lastRow); // A2:AD[lastRow]
 				dataRange.Alignment.WrapText = true;*/
 
-				//Approach 3
+				//Approach 3 - Taking 1 Min 22 Seconds
 				// Create a data style with WrapText
-				// var dataStyle = workbook.Styles.Add("DataStyle");
-				// dataStyle.Alignment.WrapText = true;
+				/*var dataStyle = workbook.Styles.Add("DataStyle");
+				dataStyle.Alignment.WrapText = true;
 
-				// // Apply data style to the entire data range after import
-				// int lastRow = rowIndex - 1;
-				// var dataRange = worksheet.Range.FromLTRB(0, 2, columns.Length - 1, lastRow); // A3:AD[lastRow] (excluding header)
-				// dataRange.Style = dataStyle;
+				// Apply data style to the entire data range after import
+				int lastRow = rowIndex - 1;
+				var dataRange = worksheet.Range.FromLTRB(0, 2, columns.Length - 1, lastRow); // A3:AD[lastRow] (excluding header)
+				dataRange.Style = dataStyle;*/
 
-				//Approach 4
+				//Approach 4 : Taking 1 Min 17 Seconds
 				// Create workbook and sheet...
-				var wrapStyle = workbook.Styles.Add("WrapStyle");
+				/*var wrapStyle = workbook.Styles.Add("WrapStyle");
 				wrapStyle.Alignment.WrapText = true;
 
 				// Apply to all columns in bulk
 				for (int i = 0; i < columns.Length; i++)
 				{
 					worksheet.Columns[i].Style = wrapStyle;
-				}
+				}*/
+
+				//On the template level wrapText Enabled taking 1 Min 03 Seconds
+				// Auto-fit rows
+				// worksheet.Rows.AutoFit(0, rowIndex).Height = 40;
+				// worksheet.Rows[1].Height = 30; // Header row height
+
+				worksheet.Columns.AutoFit(0, columns.Length - 1);
+
+				// Fixed height for data rows (bulk)
+				// worksheet.Rows[2, rowIndex - 1].Height = 20;
 
 				worksheet.Columns["A"].NumberFormat = "dd-MMM-yyyy";
 				worksheet.AutoFilter.Apply(worksheet.Range.FromLTRB(0, 1, columns.Length - 1, 1));
