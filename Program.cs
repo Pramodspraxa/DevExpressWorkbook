@@ -141,12 +141,29 @@ app.MapGet("/generate-workbook/{templateType?}", async (HttpContext context, str
 			}
 			if (applyFormatting)
 			{
+				//Approach 1 - Didn't work
+				/*worksheet.DefaultRowHeight = 200;*/
+
+				//Approach 2 - Taking 1 Min 20 Seconds
+				// Calculate the actual data range
+				/*int lastRow = rowIndex - 1; // rowIndex is already incremented after import
+				var dataRange = worksheet.Range.FromLTRB(0, 1, columns.Length - 1, lastRow); // A2:AD[lastRow]
+				dataRange.Alignment.WrapText = true;*/
+
+				//Approach 3
+				// Create a data style with WrapText
+				var dataStyle = workbook.Styles.Add("DataStyle");
+				dataStyle.Alignment.WrapText = true;
+
+				// Apply data style to the entire data range after import
+				int lastRow = rowIndex - 1;
+				var dataRange = worksheet.Range.FromLTRB(0, 2, columns.Length - 1, lastRow); // A3:AD[lastRow] (excluding header)
+				dataRange.Style = dataStyle;
+
 				worksheet.Columns["A"].NumberFormat = "dd-MMM-yyyy";
 				worksheet.AutoFilter.Apply(worksheet.Range.FromLTRB(0, 1, columns.Length - 1, 1));
-				// worksheet.DefaultRowHeight = 200;
-				int lastRow = rowIndex - 1; // rowIndex is already incremented after import
-				var dataRange = worksheet.Range.FromLTRB(0, 1, columns.Length - 1, lastRow); // A2:AD[lastRow]
-				dataRange.Alignment.WrapText = true;
+
+				// worksheet.Cells.Alignment.WrapText = true;
 
 				//DevExpress.Spreadsheet.CellRange rangeFilter = worksheet.Range["A2:AD2"];
 				//worksheet.AutoFilter.Apply(rangeFilter);
