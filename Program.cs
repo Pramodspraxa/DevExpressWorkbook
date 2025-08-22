@@ -152,13 +152,24 @@ app.MapGet("/generate-workbook/{templateType?}", async (HttpContext context, str
 
 				//Approach 3
 				// Create a data style with WrapText
-				var dataStyle = workbook.Styles.Add("DataStyle");
-				dataStyle.Alignment.WrapText = true;
+				// var dataStyle = workbook.Styles.Add("DataStyle");
+				// dataStyle.Alignment.WrapText = true;
 
-				// Apply data style to the entire data range after import
-				int lastRow = rowIndex - 1;
-				var dataRange = worksheet.Range.FromLTRB(0, 2, columns.Length - 1, lastRow); // A3:AD[lastRow] (excluding header)
-				dataRange.Style = dataStyle;
+				// // Apply data style to the entire data range after import
+				// int lastRow = rowIndex - 1;
+				// var dataRange = worksheet.Range.FromLTRB(0, 2, columns.Length - 1, lastRow); // A3:AD[lastRow] (excluding header)
+				// dataRange.Style = dataStyle;
+
+				//Approach 4
+				// Create workbook and sheet...
+				var wrapStyle = workbook.Styles.Add("WrapStyle");
+				wrapStyle.Alignment.WrapText = true;
+
+				// Apply to all columns in bulk
+				for (int i = 0; i < columns.Length; i++)
+				{
+					worksheet.Columns[i].Style = wrapStyle;
+				}
 
 				worksheet.Columns["A"].NumberFormat = "dd-MMM-yyyy";
 				worksheet.AutoFilter.Apply(worksheet.Range.FromLTRB(0, 1, columns.Length - 1, 1));
