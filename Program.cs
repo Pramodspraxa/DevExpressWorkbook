@@ -102,6 +102,11 @@ app.MapGet("/generate-workbook/{templateType?}", async (HttpContext context, str
 				range.Style = customStyle;
 				worksheet.Columns[index - 1].WidthInPixels = 100;
 				// worksheet.Cells.Alignment.WrapText = true;
+				worksheet.Columns["C"].Alignment.WrapText = true;
+				worksheet.Columns["D"].Alignment.WrapText = true;
+				worksheet.Columns["E"].Alignment.WrapText = true;
+				worksheet.Columns["F"].Alignment.WrapText = true;
+
 			}
 			int rowIndex = 2; // Start from row 2 since row 1 is header
 			int rawDataCount = rawData.Count;
